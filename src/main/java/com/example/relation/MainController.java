@@ -29,7 +29,17 @@ public class MainController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fields should only contains letter from A-Z (a-z) and whitespace");
         }
 
+        if (checkIfAlreadyExist(words)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A combination of those two word are already saved in the database, it is not possible to save twice the same combination of words");
+        }
+
         return wordsRepository.save(lowerCasingValues(words));
+    }
+
+    private boolean checkIfAlreadyExist(Words words) {
+        return wordsRepository.findAll().stream().anyMatch(x ->
+                (Objects.equals(x.getWord1(), words.getWord1()) && Objects.equals(x.getWord2(), words.getWord2()))
+                || (Objects.equals(x.getWord2(), words.getWord1()) && Objects.equals(x.getWord1(), words.getWord2())));
     }
 
     private boolean wrongPattern(Words words) {
