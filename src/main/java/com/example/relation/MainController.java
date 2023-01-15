@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -18,12 +19,16 @@ public class MainController {
         this.wordsRepository = wordsRepository;
     }
 
-    @PostMapping("/add")
-    Words newWords(@RequestBody Words words) {
+    @PostMapping("/words")
+    Words addWord(@RequestBody Words words) {
         if (Objects.equals(words.getWord1(), "") || Objects.equals(words.getWord2(), "") ||Objects.equals(words.getRelation(), "")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fields should not be empty");
         }
         return wordsRepository.save(words);
     }
 
+    @GetMapping("/words")
+    List<Words> getWords() {
+        return wordsRepository.findAll();
+    }
 }
