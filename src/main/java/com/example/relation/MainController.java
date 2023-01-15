@@ -7,6 +7,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 public class MainController {
@@ -22,7 +24,19 @@ public class MainController {
         if (Objects.equals(words.getWord1(), "") || Objects.equals(words.getWord2(), "") ||Objects.equals(words.getRelation(), "")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fields should not be empty");
         }
+
+        if (wrongPattern(words)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fields should only contains letter from A-Z (a-z) and whitespace");
+        }
+
         return wordsRepository.save(lowerCasingValues(words));
+    }
+
+    private boolean wrongPattern(Words words) {
+        Pattern pattern = Pattern.compile("[^a-zA-Z\\s]");
+        return (pattern.matcher(words.getWord1()).find()
+                || pattern.matcher(words.getWord2()).find()
+                || pattern.matcher(words.getRelation()).find());
     }
 
     private Words lowerCasingValues(Words words) {
